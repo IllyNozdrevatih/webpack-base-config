@@ -17,5 +17,5 @@ Webpack base config. Include browsersync and support ES 5, scss
 <h2>Commands</h2>
 
 <ul>
-  <li>npm run develop <small>watch and open localhost</small></li>
+  <li>npm run develop</li>
 </ul>

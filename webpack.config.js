@@ -1,11 +1,15 @@
 const path = require('path');
-const BrowserSyncPlugin = require('browser-sync-webpack-plugin')
+const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
 
 module.exports = {
-  entry: './src/index.js',
+  entry: {
+    app: './src/index.js'
+  },
   output: {
-    filename: 'main.js',
-    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',
+    path: path.resolve(__dirname, './dist'),
   },
   module: {
     rules: [
@@ -20,26 +24,55 @@ module.exports = {
         }
       },
       {
-        test: /\.s[ac]ss$/i,
+        test: /\.css$/,
         use: [
-          // Creates `style` nodes from JS strings
           'style-loader',
-          // Translates CSS into CommonJS
-          'css-loader',
-          // Compiles Sass to CSS
-          'sass-loader',
-        ],
-      },      
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: { sourceMap: true }
+          }, {
+            loader: 'postcss-loader',
+            options: { sourceMap: true, config: { path: './postcss.config.js' } }
+          }
+        ]
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          'style-loader',
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: { sourceMap: true }
+          }, 
+          {
+            loader: 'postcss-loader',
+            options: { sourceMap: true, config: { path: './postcss.config.js' } }
+          }, 
+          {
+            loader: 'sass-loader',
+            options: { sourceMap: true }
+          }
+        ]
+      }    
     ]
   },
+  devServer: {
+    overlay: true,
+    contentBase: path.join(__dirname, 'dist'),
+  },
   plugins: [
-    new BrowserSyncPlugin({
-      // browse to http://localhost:3000/ during development,
-      // ./public directory is being served
-      host: 'localhost',
-      port: 3000,
-      files: './dist/*.html',
-      server: { baseDir: 'dist', index: "index.html" }
+    new MiniCssExtractPlugin({
+      filename: "[name].css",
     })
+  //   new BrowserSyncPlugin({
+  //     // browse to http://localhost:3000/ during development,
+  //     // ./public directory is being served
+  //     host: 'localhost',
+  //     port: 3000,
+  //     files: './dist/*.html',
+  //     server: { baseDir: 'dist', index: "index.html" }
+  //   })
   ]
 };
